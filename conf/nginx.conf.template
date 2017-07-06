@@ -1,0 +1,61 @@
+#
+# Tiger-Nginx的配置文件
+# 脚本中以“__”命名的宏由安装脚本自动替换
+#
+
+user root;
+
+worker_processes __WORKER_NUM__;
+worker_cpu_affinity __CPU_AFF__;
+
+worker_rlimit_nofile 200000;
+
+events {
+    use epoll;
+    worker_connections 100000;
+}
+
+error_log __PATH__/logs/error.log notice;
+
+http {
+    access_log off;
+
+    lua_package_path '__PATH__/openresty/lualib/?.lua;__PATH__/lua/?.lua;__PATH__/conf/?.lua;__PATH__/lua/lua-resty-http/?.lua';
+
+    lua_shared_dict shdict 8m;
+    lua_shared_dict shdicta 1024m;
+    lua_shared_dict shdictb 1024m;
+
+    client_header_buffer_size 64k;
+    large_client_header_buffers 4 128k;
+    client_body_buffer_size 8m;
+
+    lua_max_pending_timers 100;
+    lua_max_running_timers 100;
+
+    init_by_lua '
+        local init = require "init"
+        init.init()
+    ';
+
+    init_worker_by_lua '
+        local init = require "init"
+        init.init_worker()
+    ';
+
+    server {
+        listen __PORT__;
+
+        # HTTP Source 请求
+        location ~ ^/data$ {
+            content_by_lua '
+                local source_http = require "source.source_http"
+                source_http.handler()
+            ';
+        }
+
+        location / {
+            echo "Hello Tiger!";
+        }
+    }
+}
