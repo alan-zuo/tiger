@@ -31,10 +31,25 @@ Tiger设计实现了这个简单的Key组合多Value的累加计算模型，无�
 配置文件为一个lua文件，Tiger为了简便，通过这种方式将配置融入Lua代码中，所以不要修改配置文件中return关键字及大括号结构
 配置分为两块，Source配置和Sink配置，区分的方法很简单，名称为source开头的即为source配置，sink同理
 Http Source是默认开启的，对然开启，但不用的话，也不会占用任何系统资源
+
 Redis Source通过source_redis_on开关来开启，true为开启，false为关闭
 source_redis配置项是一个lua table，默认的配置文件中已经给了例子，直观很好理解
 可配置多个redis，每个redis可配置ip、端口、list名称
+source_tps_on为是否打开tps统计的开关，tps的大小会在error.log中不断的打印，供分析Tiger运行情况用
+注意，这里的tps并不是source直观上的读入数据的条数，因为Tiger支持用分号分割一次写入多条数据，这个tps是拆分成多条后的数据条数
+也就是标准Tiger数据格式的条数，这样做的理由是，Tiger基于单条Tiger数据来做内部累加计算，这个tps才能直观的反应Tiger的压力，而不是Source读入的条数
+不过，有时候Source读数据的系统资源占用同样高，未来会扩展source读入的tps
 
+sink_type是sink的类型，如果为空，则不开启任何sink
+如果配置mysql，则开启Mysql sink，如果配置http，则开启http sink
+如果配置的非mysql也非http，则等同于设置空，不开启任何sink
+sink_http开头的为http sink的配置，sink_mysql为mysql sink的配置
+http sink的设定是为了建立tiger之间的连接，那么这个http sink则配置的是下游tiger的信息
+包括ip、端口、http超时、连接池大小和超时
+mysql的配置包含ip、端口、数据库名称、用户名、密码、超时时间、连接池大小和超时
+
+sink_interval是多久向下游写一次数据
+Tiger的计算框架是source不断接收数据累加在本地内存中，每隔一段时间将累加的数据写向下游，这个interval就是配置这个的
 
 多Redis和多worker之间的匹配：
 
