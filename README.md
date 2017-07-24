@@ -72,25 +72,16 @@ Http Source是默认开启的，虽然开启，但如果不用的话，不会额
 
 两个Tiger间的通信使用Http Sink，在上一个配置文件中配置下一个Tiger的ip、port等即可形成一个两个节点的计算流。
 
-sink_type是sink的类型，如果为空，则不开启任何sink
-如果配置mysql，则开启Mysql sink，如果配置http，则开启http sink
-如果配置的非mysql也非http，则等同于设置空，不开启任何sink
-sink_http开头的为http sink的配置，sink_mysql为mysql sink的配置
-http sink的设定是为了建立tiger之间的连接，那么这个http sink则配置的是下游tiger的信息
-包括ip、端口、http超时、连接池大小和超时
-mysql的配置包含ip、端口、数据库名称、用户名、密码、超时时间、连接池大小和超时
 
-sink_interval是多久向下游写一次数据
-Tiger的计算框架是source不断接收数据累加在本地内存中，每隔一段时间将累加的数据写向下游，这个interval就是配置这个的
+### 多Redis和多worker的匹配
 
-多Redis和多worker之间的匹配：
+如果阅读了关于redis的配置会知道，Tiger的redis source支持配置多个redis，那么多个worke和多个redis是如何匹配对应的呢？
 
-如果阅读了关于redis的配置，你会知道，Tiger的redis source支持配置多个redis
-那么多个worke和多个redis是如何匹配对应的呢？
-如果每个worker都连接所有redis，则会建立大量redis连接，这是比较臃肿的设计
-我们通过几个例子来理解Tiger的做法
-比如启动了8个worker，配置了8个redis，则Tiger会让每个worker分别连接一个redis，正好每个worker一个
-如果是8 worker + 1 redis，则每个worker都会连接这个redis，因为要负载均衡，不能有worker闲着
-如果是8 worker + 3 redis，则像填空一样，8个worker是8个格子，依次填入redis，设redis为1 2 3编号，则结果为1 2 3 1 2 3 1 2
-如果是8 worker + 9 redis，则有一个worker会多连一个redis
-到这里你应该理解了Tiger的做法，就是类似上述按顺序填空，不能让任何一个worker闲着，也不能让任何一个redis不被连接
+如果每个worker都连接所有redis，则会建立大量redis连接，这是比较臃肿的设计，可以通过几个例子来理解Tiger的做法
+
+* 如果启动8个worker，配置8个redis，则Tiger会让每个worker分别连接一个redis，正好每个worker一个；
+* 如果启动8个worker，配置1个redis，则每个worker都会连接这个redis，因为要负载均衡，不能有worker闲着；
+* 如果启动8个worker，配置3个redis，则像填空一样，8个worker是8个格子，依次填入redis，设redis为1 2 3编号，则结果为1 2 3 1 2 3 1 2；
+* 如果启动8个worker，配置9个redis，则有一个worker会多连一个redis；
+
+实际上，就是类似上述按顺序填空，不能让任何一个worker闲着，也不能让任何一个redis不被连接
