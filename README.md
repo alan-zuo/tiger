@@ -27,13 +27,13 @@ Tiger设计实现了这个简单的计算模型，一般使用中无需编写任
 
 #### Source
 
-Redis Source
-Http Sink
+* Redis Source
+* Http Sink
 
 #### Sink
 
-MySQL Source
-Http Sink
+* MySQL Source
+* Http Sink
 
 ### 配置
 
