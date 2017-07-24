@@ -41,17 +41,36 @@ Tiger设计实现了这个简单的计算模型，一般使用中无需编写任
 
 配置文件为一个lua文件，Tiger为了简洁，通过这种方式将配置融入框架lua代码中，所以不要修改配置文件中return关键字及大括号结构。配置分为两块，Source配置和Sink配置，区分的方法很简单，名称为source开头的即为source配置，sink同理。
 
-|配置名称|
-|:-----:|
-|source_redis_on|
+Http Source是默认开启的，虽然开启，但如果不用的话，不会额外占用系统资源。
 
-Redis Source通过source_redis_on开关来开启，true为开启，false为关闭
-source_redis配置项是一个lua table，默认的配置文件中已经给了例子，直观很好理解
-可配置多个redis，每个redis可配置ip、端口、list名称
-source_tps_on为是否打开tps统计的开关，tps的大小会在error.log中不断的打印，供分析Tiger运行情况用
-注意，这里的tps并不是source直观上的读入数据的条数，因为Tiger支持用分号分割一次写入多条数据，这个tps是拆分成多条后的数据条数
-也就是标准Tiger数据格式的条数，这样做的理由是，Tiger基于单条Tiger数据来做内部累加计算，这个tps才能直观的反应Tiger的压力，而不是Source读入的条数
-不过，有时候Source读数据的系统资源占用同样高，未来会扩展source读入的tps
+|配置名称|含义|是否为必填|
+|:-:|:-:|:-:|
+|source_redis_on|是否开启Redis Source，true为开启，false为关闭|是|
+|source_redis|Redis配置列表，每行包含ip、port、list_name|否|
+|source_tps_on|是否打开tps统计的开关，true为开启，false为关闭|是|
+|sink_type|Sink的类型，mysql为开启MySQL Sink，http为开启Http Sink，空或其它值为不开启任何Sink|是|
+|sink_http_target_ip|Http Sink的ip|sink_type为http时必填|
+|sink_http_target_port|Http Sink的port|sink_type为http时必填|
+|sink_http_timeout|Http Sink的超时时间|sink_type为http时必填|
+|sink_http_pool_timeout|Http Sink的连接池中连接的过期时间|sink_type为http时必填|
+|sink_http_pool_size|Http Sink的连接池大小|sink_type为http时必填|
+|sink_mysql_host|MySQL Sink的host|sink_type为mysql时必填|
+|sink_mysql_port|MySQL Sink的port|sink_type为mysql时必填|
+|sink_mysql_dbname|MySQL Sink的数据库名|sink_type为mysql时必填|
+|sink_mysql_username|MySQL Sink的用户名|sink_type为mysql时必填|
+|sink_mysql_passwd|MySQL Sink的密码|sink_type为mysql时必填|
+|sink_mysql_timeout|MySQL Sink的超时时间|sink_type为mysql时必填|
+|sink_mysql_pool_size|MySQL Sink的连接池大小|sink_type为mysql时必填|
+|sink_mysql_conn_ttl|MySQL Sink的连接池中连接的过期时间|sink_type为mysql时必填|
+|sink_interval|多久向下传递一次数据|是|
+
+### Tps统计
+
+通过配置项source_tps_on开启tps统计，tps信息会在error.log中不断的打印，供分析Tiger运行情况用。注意，这里的tps并不是source直观上的读入数据的条数，因为Tiger支持用分号分割一次写入多条数据，这个tps是拆分成多条后的数据条数，也就是标准Tiger数据格式的条数。这样做的理由是，Tiger基于单条Tiger数据来做内部累加计算，这个tps才能直观的反应Tiger的压力，而不是Source读入的条数。
+
+### 连接两个Tiger
+
+两个Tiger间的通信使用Http Sink，在上一个配置文件中配置下一个Tiger的ip、port等即可形成一个两个节点的计算流。
 
 sink_type是sink的类型，如果为空，则不开启任何sink
 如果配置mysql，则开启Mysql sink，如果配置http，则开启http sink
