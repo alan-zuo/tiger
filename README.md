@@ -10,7 +10,7 @@ Tiger是一个基于Openresty开发的实时统计计算工具。
 Tiger设计实现了这个简单的Key组合多Value的累加计算模型，无需编写任何计算代码，只需要向Tiger写入特定格式数据，它就会自动将数据做好计算后落入指定位置。
 
 关键功能：
-1. 类似Flume的多Source多Sink模型，固定支持Redis source、Http source、MySQL sink、Http sink；
+1. 类似Flume的多Source多Sink模型，固定支持Redis/Http Source、MySQL/Http Sink；
 2. 得益与计算模型的固化和多线程生产配多线程消费的设计，计算效率、实时性、资源占用率都表现非常好；
 3. 依赖Lua语言的简便和Openresty框架的优势，可快速编写自定义Source和Sink；
 4. 每一个Tiger实例都是一个实时计算网的节点，可像积木一样组合成任意的计算流；
