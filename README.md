@@ -1,6 +1,6 @@
 # Tiger
 
-TODO: 文档还在编辑中
+**编辑中...**
 
 Tiger是一个基于Openresty开发的实时统计计算工具。
 
