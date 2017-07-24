@@ -15,21 +15,35 @@ Tiger设计实现了这个简单的计算模型，一般使用中无需编写任
 * 得益于简单计算模型的固化，计算性能、实时性、资源占用率都表现非常好；
 * 支持数据自定义处理插件，可通过lua对数据做中间转换；
 
-安装步骤：
+### 安装
+
 1. 下载Tiger
 2. 从Openresty官网下载其安装包
 3. ./install [Openresty安装包] [目标目录] [端口]
 4. 根据需要修改配置文件conf/config.lua
 5. 启动./start.sh
 
-默认开启Http Source，不开启任何Sink
+### 支持的Source和Sink
 
-配置详解：
+#### Source
 
-安装后conf/config.lua为配置文件，此文件中包含了所有Tiger的配置，不存在不在此文件中的配置项
-配置文件为一个lua文件，Tiger为了简便，通过这种方式将配置融入Lua代码中，所以不要修改配置文件中return关键字及大括号结构
-配置分为两块，Source配置和Sink配置，区分的方法很简单，名称为source开头的即为source配置，sink同理
-Http Source是默认开启的，对然开启，但不用的话，也不会占用任何系统资源
+Redis Source
+Http Sink
+
+#### Sink
+
+MySQL Source
+Http Sink
+
+### 配置
+
+安装后conf/config.lua为配置文件，此文件中包含了所有Tiger的配置，所有的配置项均在此文件中。
+
+配置文件为一个lua文件，Tiger为了简洁，通过这种方式将配置融入框架lua代码中，所以不要修改配置文件中return关键字及大括号结构。配置分为两块，Source配置和Sink配置，区分的方法很简单，名称为source开头的即为source配置，sink同理。
+
+|配置名称|
+|:-----:|
+|source_redis_on|
 
 Redis Source通过source_redis_on开关来开启，true为开启，false为关闭
 source_redis配置项是一个lua table，默认的配置文件中已经给了例子，直观很好理解
