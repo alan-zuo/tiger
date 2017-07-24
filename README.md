@@ -27,4 +27,23 @@ Tiger设计实现了这个简单的Key组合多Value的累加计算模型，无�
 
 配置详解：
 
-TODO
+安装后conf/config.lua为配置文件，此文件中包含了所有Tiger的配置，不存在不在此文件中的配置项
+配置文件为一个lua文件，Tiger为了简便，通过这种方式将配置融入Lua代码中，所以不要修改配置文件中return关键字及大括号结构
+配置分为两块，Source配置和Sink配置，区分的方法很简单，名称为source开头的即为source配置，sink同理
+Http Source是默认开启的，对然开启，但不用的话，也不会占用任何系统资源
+Redis Source通过source_redis_on开关来开启，true为开启，false为关闭
+source_redis配置项是一个lua table，默认的配置文件中已经给了例子，直观很好理解
+可配置多个redis，每个redis可配置ip、端口、list名称
+
+
+多Redis和多worker之间的匹配：
+
+如果阅读了关于redis的配置，你会知道，Tiger的redis source支持配置多个redis
+那么多个worke和多个redis是如何匹配对应的呢？
+如果每个worker都连接所有redis，则会建立大量redis连接，这是比较臃肿的设计
+我们通过几个例子来理解Tiger的做法
+比如启动了8个worker，配置了8个redis，则Tiger会让每个worker分别连接一个redis，正好每个worker一个
+如果是8 worker + 1 redis，则每个worker都会连接这个redis，因为要负载均衡，不能有worker闲着
+如果是8 worker + 3 redis，则像填空一样，8个worker是8个格子，依次填入redis，设redis为1 2 3编号，则结果为1 2 3 1 2 3 1 2
+如果是8 worker + 9 redis，则有一个worker会多连一个redis
+到这里你应该理解了Tiger的做法，就是类似上述按顺序填空，不能让任何一个worker闲着，也不能让任何一个redis不被连接
