@@ -1,5 +1,7 @@
 # Tiger
 
+TODO: 文档还在编辑中
+
 Tiger是一个基于Openresty开发的实时统计计算工具。
 
 日常开发中，我们会遇到很多需要实时统计数据的场景，实现的可选工具很多，比如Storm、Spark streaming、Kafka streams等。
