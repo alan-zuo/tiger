@@ -87,3 +87,7 @@ Http Source是默认开启的，虽然开启，但如果不用的话，不会额
 * 如果启动8个worker，配置9个redis，则有一个worker会多连一个redis；
 
 实际上，就是类似上述按顺序填空，不能让任何一个worker闲着，也不能让任何一个redis不被连接
+
+### Mysql Sink 建表SQL样例
+
+create table imp_ratio (time char(16), rtb char(8), ads int default 0, imp int default 0, primary key (time, rtb));
