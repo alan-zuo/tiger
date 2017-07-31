@@ -32,6 +32,12 @@ local function to_shdict_in(item)
             if not newval then
                 ngx.log(ngx.ERR, "ShareDict command incr fail, " .. err)
             end
+        else if string.sub(item_pis[1], 1, 1) == "+" then
+            local shd_key = item_pis[1] .. "|" ..  item_pis[2] .. "|" .. val_pis[1]
+            local succ, err = use_shdict:set(shd_key, val_pis[2])
+            if not succ then
+                ngx.log(ngx.ERR, "ShareDict command set fail, " .. err)
+            end
         end
     end
 end
