@@ -22,7 +22,7 @@ local function read_redis(premature, redis_index)
                 -- brpop在没有数据时会阻塞，设定最多阻塞10秒
                 local res, err = rds:brpop(config.source_redis[redis_index].list, 10)
                 if not res then
-                    ngx.log(ngx.ERR, "Failed to execute Redis command brpop,", err)
+                    ngx.log(ngx.ERR, "Failed to execute Redis command brpop, ", err)
                     break
                 elseif res ~= ngx.null then
                     -- 如果是一次写入的多条数据，则拆分后写入shdict
